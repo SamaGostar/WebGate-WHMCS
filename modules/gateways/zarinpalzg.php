@@ -1,3 +1,4 @@
+
 <?php
 /**
  * @author Masoud Amini
@@ -9,7 +10,7 @@ function zarinpalzg_config() {
      "merchantID" => array("FriendlyName" => "merchantID", "Type" => "text", "Size" => "50", ),
      "Currencies" => array("FriendlyName" => "Currencies", "Type" => "dropdown", "Options" => "Rial,Toman", ),
 	 "MirrorName" => array("FriendlyName" => "نود اتصال", "Type" => "dropdown", "Options" => "آلمان,ایران,خودکار", "Description" => "چناانچه سرور شما در ایران باشد ایران دا انتخاب کنید و در غیر اینصورت آلمان و یا خودکار را انتخاب کنید", ),
-     "afp" => array("FriendlyName" => "افزودن کارمزد به قیمت ها", "Type" => "yesno", "Description" => "در صورت انتخاب 2.5 درصد به هزینه پرداخت شده افزوده می شود.", ),
+     "afp" => array("FriendlyName" => "افزودن کارمزد به قیمت ها", "Type" => "yesno", "Description" => "در صورت انتخاب 1 درصد به هزینه پرداخت شده افزوده می شود.", ),
      );
 	return $configarray;
 }
@@ -46,9 +47,9 @@ function zarinpalzg_link($params) {
 	$currency = $params['currency'];
 
 	# Enter your code submit to the gateway...
-	
+
 	$code = '
-    <form method="post" action="">
+    <form method="post" action="./zarinpalzg.php">
         <input type="hidden" name="merchantID" value="'. $merchantID .'" />
         <input type="hidden" name="invoiceid" value="'. $invoiceid .'" />
         <input type="hidden" name="amount" value="'. $amount .'" />
@@ -61,83 +62,6 @@ function zarinpalzg_link($params) {
         <input type="submit" name="pay" value=" پرداخت " />
     </form>
     ';
-
-	if(isset($_POST['pay']) OR strpos($_SERVER['PHP_SELF'],'cart.php') > 0)
-	{
-		$Amount = intval($amount);
-		if($currencies == 'Rial'){
-			$Amount = round($Amount/10);
-		}
-		
-		if($afp=='on'){
-			$Fee = round($Amount*0.01);
-		} else {
-			$Fee = 0;
-		}
-		
-		switch($mirrorname){
-			case 'آلمان': 
-				$mirror = 'de';
-				break;
-			case 'ایران':
-				$mirror = 'ir';
-				break;
-			default:
-				$mirror = 'de';
-				break;
-		}
-		
-		$CallbackURL = $_POST['systemurl'] .'/modules/gateways/callback/zarinpalzg.php?invoiceid='. $invoiceid;
-		try {
-			$client = new SoapClient('https://'. $mirror .'.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8'));
-		
-			$result = $client->PaymentRequest(
-												array(
-														'MerchantID' 	=> $merchantID,
-														'Amount' 		=> $Amount+$Fee,
-														'Description' 	=> 'Invoice ID: '. $invoiceid,
-														'Email' 		=> $email,
-														'Mobile' 		=> $phone,
-														'CallbackURL' 	=> $CallbackURL
-													)
-											);
-		} catch (Exception $e) {
-			$code =  '<h2>وقوع وقفه!</h2>';
-			$code .= $e->getMessage();
-		}
-		if($result->Status == 100){ 
-			$Authority = $result->Authority;
-			
-			mysql_query("CREATE TABLE IF NOT EXISTS `tblZarinPalLog` (
-				  `id` int(11) NOT NULL AUTO_INCREMENT,
-				  `orderId` varchar(32) NOT NULL,
-				  `Amount` varchar(32) NOT NULL,
-				  `Authority` varchar(64) NOT NULL,
-				  PRIMARY KEY (`id`)
-				) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;");
-			
-			mysql_query("INSERT INTO `tblZarinPalLog` (`orderId`,`Amount`,`Authority`) VALUES ('".$invoiceid."','".$Amount."','".$Authority."') ");
-			$url = 'https://www.zarinpal.com/pg/StartPay/' . $result->Authority .'/ZarinGate';
-			header('Location: '. $url);
-				
-			if(! strpos($_SERVER['PHP_SELF'],'cart.php') > 0)
-				$code .= '<form method="post" action="">
-        <input type="hidden" name="merchantID" value="'. $merchantID .'" />
-        <input type="hidden" name="invoiceid" value="'. $invoiceid .'" />
-        <input type="hidden" name="amount" value="'. $amount .'" />
-        <input type="hidden" name="currencies" value="'. $currencies .'" />
-        <input type="hidden" name="afp" value="'. $afp .'" />
-        <input type="hidden" name="systemurl" value="'. $systemurl .'" />
-		<input type="hidden" name="email" value="'. $email .'" />
-		<input type="hidden" name="cellnum" value="'. $phone .'" />
-		<input type="hidden" name="mirrorname" value="'. $mirrorname .'" />
-        <input type="submit" name="pay" value=" پرداخت " />
-    </form>';
-		} else {
-			$code = "<h2>وقوع خطا در ارتباط!</h2>"
-				.'کد خطا'. $result->Status;
-		}
-	}
 
 	return $code;
 }
