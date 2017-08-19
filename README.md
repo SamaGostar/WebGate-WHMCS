@@ -1,2 +1,2 @@
-WebGate-WHMCS-
-==============
+ZarinGate-WHMCS
+===============
