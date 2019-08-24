@@ -1,15 +1,16 @@
 <?php
-/**
- * @author Masoud Amini
- * @copyright 2013
- */
+    /*
+     * update to rest ::: E.hassani ::: zarinpal
+     *::: www.vahabonline.ir
+     *::: myvahab@gmail.com
+    */
 function zarinpalwg_config() {
     $configarray = array(
      "FriendlyName" => array("Type" => "System", "Value"=>"زرین پال - وب گیت"),
      "merchantID" => array("FriendlyName" => "merchantID", "Type" => "text", "Size" => "50", ),
      "Currencies" => array("FriendlyName" => "Currencies", "Type" => "dropdown", "Options" => "Rial,Toman", ),
 	 "MirrorName" => array("FriendlyName" => "نود اتصال", "Type" => "dropdown", "Options" => "آلمان,ایران,خودکار", "Description" => "چناانچه سرور شما در ایران باشد ایران دا انتخاب کنید و در غیر اینصورت آلمان و یا خودکار را انتخاب کنید", ),
-     "afp" => array("FriendlyName" => "افزودن کارمزد به قیمت ها", "Type" => "yesno", "Description" => "در صورت انتخاب 1 درصد به هزینه پرداخت شده افزوده می شود.", ),
+     "afp" => array("FriendlyName" => "افزودن کارمزد به قیمت ها", "Type" => "yesno", "Description" => "در صورت انتخاب 2.5 درصد به هزینه پرداخت شده افزوده می شود.", ),
      );
 	return $configarray;
 }
