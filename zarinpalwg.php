@@ -46,7 +46,7 @@
 			'CallbackURL' => $CallbackURL,
 			'Description' => 'Invoice ID: '. $_POST['invoiceid']);
 		$jsonData = json_encode($data);
-		$ch = curl_init('https://www.zarinpal.com/pg/rest/WebGate-ZarinGate/PaymentRequest.json');
+		$ch = curl_init('https://www.zarinpal.com/pg/rest/WebGate/PaymentRequest.json');
 		curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v1');
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
